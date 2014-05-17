@@ -1,0 +1,48 @@
+/*
+ * The MIT License
+ *
+ * Copyright 2014 Piotr SQLek Skólski.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
+package com.jme3.noise;
+
+/** Noise source of two dimesnion.
+ * 
+ * Returned values are in range of minus one to plus one inclusive.
+ * 
+ * All implementors should accept all numerically valid cordinates.
+ * NaN and INF are prohibited in inputs and outputs.
+ * 
+ * @author Piotr SQLek Skólski
+ * @see com.jme3.noise.basic.PermutedNoise
+ * @see com.jme3.noise.fractal.FractalNoise3d
+ * @see com.jme3.noise.common.ImprovedPerlin
+ */
+public interface Noise2d {
+    
+    /** Computes noise sample for given cordinate.
+     *
+     * @param x Input cordinate. Any value except NaN and INF.
+     * @param y Input cordinate. Any value except NaN and INF.
+     * @return Noise sample in range of minus one to plus one inclusive.
+     */
+    float value(float x, float y);
+}
