@@ -28,7 +28,13 @@ import com.jme3.noise.Permutator;
 import com.jme3.noise.basic.PermutedNoise;
 
 /**
- * Under Construction.
+ * Improved perlin noise generator.
+ * 
+ * Third dimension version is very similar to reference implementation from
+ * Ken Perlin.
+ * 
+ * In addition it support tiling, one and two dimensions as well.
+ * Support for four dimension is planed but not done.
  *
  * @author Piotr SQLek Skólski
  */
@@ -89,7 +95,16 @@ public class ImprovedPerlin extends PermutedNoise {
 
     @Override
     public float value(float x) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        int X = (int) Math.floor(x);
+        x -= X;
+
+        //corners int values A means lower value B means +1 value, vec(xyzw)
+        int A = valueInt(X);
+        int B = valueInt(X + 1);
+
+        return fader.fade(x,
+                grad(A, x),
+                grad(B, x - 1));
     }
 
     @Override
@@ -116,55 +131,105 @@ public class ImprovedPerlin extends PermutedNoise {
 
     @Override
     public float value(float x, float y, float z) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        int X = (int) Math.floor(x);
+        int Y = (int) Math.floor(y);
+        int Z = (int) Math.floor(z);
+        x -= X;
+        y -= Y;
+        z -= Z;
+
+        //corners int values A means lower value B means +1 value, vec(xyzw)
+        int AAA = valueInt(X, Y, Z);
+        int AAB = valueInt(X, Y, Z + 1);
+        int ABA = valueInt(X, Y + 1, Z);
+        int ABB = valueInt(X, Y + 1, Z + 1);
+        int BAA = valueInt(X + 1, Y, Z);
+        int BAB = valueInt(X + 1, Y, Z + 1);
+        int BBA = valueInt(X + 1, Y + 1, Z);
+        int BBB = valueInt(X + 1, Y + 1, Z + 1);
+
+        return fader.fade(x,
+                fader.fade(y,
+                        fader.fade(z,
+                                grad(AAA, x, y, z),
+                                grad(AAB, x, y, z - 1)),
+                        fader.fade(z,
+                                grad(ABA, x, y - 1, z),
+                                grad(ABB, x, y - 1, z - 1))),
+                fader.fade(y,
+                        fader.fade(z,
+                                grad(BAA, x - 1, y, z),
+                                grad(BAB, x - 1, y, z - 1)),
+                        fader.fade(z,
+                                grad(BBA, x - 1, y - 1, z),
+                                grad(BBB, x - 1, y - 1, z - 1))));
     }
 
+    /** 4d version not ready.
+     * 
+     *  This method will throw {@link UnsupportedOperationException}.
+     * 
+     * @param x Input coordinate.
+     * @param y Input coordinate.
+     * @param z Input coordinate.
+     * @param w Input coordinate.
+     * @return Computed noise.
+     */
     @Override
     public float value(float x, float y, float z, float w) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public float grad(int index, float x, float y) {
+    /** Hash a gradiend.
+     *
+     * @param index Index of gradiend.
+     * @param x Fract of x coord.
+     * @return Computed gradiend.
+     */
+    public static float grad(int index, float x) {
+        return ((index & 1) == 0 ? x : -x);
+    }
+
+    /** Hash a gradiend.
+     *
+     * @param index Index of gradiend.
+     * @param x Fract of x coord.
+     * @param y Fract of y coord.
+     * @return Computed gradiend.
+     */
+    public static float grad(int index, float x, float y) {
         int h = index & 3;
         return ((h & 1) == 0 ? x : -x) + ((h & 2) == 0 ? y : -y);
     }
 
-    public float grad(int index, float x, float y, float z) {
-        switch (index & 0x0f) {
-            case 0:
-                return x + y;
-            case 1:
-                return -x + y;
-            case 2:
-                return x + y;
-            case 3:
-                return -x + y;
-            case 4:
-                return x + y;
-            case 5:
-                return -x + y;
-            case 6:
-                return x + y;
-            case 7:
-                return -x + y;
-            case 8:
-                return x + y;
-            case 9:
-                return x + y;
-            case 10:
-                return x + y;
-            case 11:
-                return x + y;
-            case 12:
-                return x + y;
-            case 13:
-                return x + y;
-            case 14:
-                return x + y;
-            case 15:
-                return x + y;
-        }
-        return 0;
+    /** Hash a gradiend.
+     *
+     * @param index Index of gradiend.
+     * @param x Fract of x coord.
+     * @param y Fract of y coord.
+     * @param z Fract of z coord.
+     * @return Computed gradiend.
+     */
+    public static float grad(int index, float x, float y, float z) {
+        int h = index & 15;
+        float u = h < 8 ? x : y,
+                v = h < 4 ? y : h == 12 || h == 14 ? x : z;
+        return ((h & 1) == 0 ? u : -u) + ((h & 2) == 0 ? v : -v);
+    }
+    
+    /** Hash a gradiend. ToDO.
+     *
+     * This method will throw {@link UnsupportedOperationException}.
+     * 
+     * @param index Index of gradiend.
+     * @param x Fract of x coord.
+     * @param y Fract of y coord.
+     * @param z Fract of z coord.
+     * @param w Fract of w coord.
+     * @return Computed gradiend.
+     */
+    public static float grad(int index, float x, float y, float z, float w) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
 }
